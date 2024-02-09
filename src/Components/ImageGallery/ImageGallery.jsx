@@ -1,5 +1,5 @@
 import { ImageCard } from "../ImageCard/ImageCard";
-import css from "../ImageGallery/ImageGallery.module.css";
+import css from "./ImageGallery.module.css";
 
 export const ImageGallery = ({ dates, toggleModal, getImageForModal }) => {
   return (

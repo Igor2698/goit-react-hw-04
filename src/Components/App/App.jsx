@@ -1,16 +1,16 @@
-import css from "../App/App.module.css";
-import { SearchBar } from "../SearchBar/SearchBar";
-import { ImageGallery } from "../ImageGallery/ImageGallery";
-import { ImageModal } from "../ImageModal/ImageModal";
-import { Loader } from "../Loader/Loader";
-import { LoadMoreButton } from "../LoadMoreButton/LoadMoreButton";
-import { fetchImages } from "../images-api";
-import { ErrorMessage } from "../ErrorMessage/ErrorMessage";
-import customStyles from "../custom-styles";
+import css from "./App.module.css";
+import customStyles from "../../custom-styles";
 import Modal from "react-modal";
 import { useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { ErrorMessage } from "../ErrorMessage/ErrorMessage";
+import { LoadMoreButton } from "../LoadMoreButton/LoadMoreButton";
+import { ImageModal } from "../ImageModal/ImageModal";
+import { SearchBar } from "../SearchBar/SearchBar";
+import { ImageGallery } from "../ImageGallery/ImageGallery";
+import { Loader } from "../Loader/Loader";
+import { fetchImages } from "../../images-api";
 
 function App() {
   const [loading, setLoading] = useState(false);
@@ -20,14 +20,11 @@ function App() {
   const [page, setPage] = useState(1);
   const [imageForModal, setImageForModal] = useState("");
   const [valueToSearch, setValueToSearch] = useState("");
-  const [firstRender, setFirstRender] = useState(true);
+
   const [totalPages, setTotalPages] = useState(0);
 
   useEffect(() => {
-    if (firstRender) {
-      setFirstRender(false);
-      return;
-    }
+    if (!valueToSearch) return;
 
     async function handleSearch(value) {
       try {
@@ -47,10 +44,9 @@ function App() {
 
         setTotalPages(data.total_pages);
         setImages([...images, ...data.results]);
-        setLoading(false);
       } catch {
-        console.log(error);
         setError(true);
+      } finally {
         setLoading(false);
       }
     }
@@ -58,26 +54,24 @@ function App() {
     handleSearch(valueToSearch);
   }, [page, valueToSearch]);
 
-  useEffect(() => {
-    setPage(1);
-  }, [valueToSearch]);
-
   function toggleModal() {
     setIsOpen(!modalIsOpen);
     document.body.style.overflow = modalIsOpen ? "auto" : "hidden";
   }
 
-  const getImageForModal = (img) => {
+  function getImageForModal(img) {
     setImageForModal(img);
-  };
+    toggleModal();
+  }
 
-  const onSearchButton = (value) => {
+  function onSearchButton(value) {
     if (value.trim() === "") {
       return toast("Value cannot be empty");
     }
+    setPage(1);
     setValueToSearch(value);
     setImages([]);
-  };
+  }
 
   return (
     <>
@@ -87,11 +81,7 @@ function App() {
       {error && <ErrorMessage />}
       {images.length > 0 && !error && (
         <section className={css.section}>
-          <ImageGallery
-            dates={images}
-            toggleModal={toggleModal}
-            getImageForModal={getImageForModal}
-          />
+          <ImageGallery dates={images} getImageForModal={getImageForModal} />
         </section>
       )}
       {loading && <Loader />}

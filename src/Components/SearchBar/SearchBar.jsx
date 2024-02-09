@@ -1,4 +1,4 @@
-import css from "../SearchBar/SearchBar.module.css";
+import css from "./SearchBar.module.css";
 
 export const SearchBar = ({ onSearch }) => {
   const handleSubmit = (evt) => {
